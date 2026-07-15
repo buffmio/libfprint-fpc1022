@@ -154,6 +154,21 @@ if have_spi
     default_drivers += spi_drivers
 endif
 
+# SIGFM-based drivers require OpenCV for SIFT keypoint matching
+sigfm_drivers = [
+]
+
+# Distributions differ in which major version they ship a .pc file for.
+opencv_dep = dependency('opencv4', required: false)
+if not opencv_dep.found()
+    opencv_dep = dependency('opencv5', required: false)
+endif
+have_opencv = opencv_dep.found()
+if have_opencv
+    default_drivers += sigfm_drivers
+    libfprint_conf.set10('HAVE_SIGFM', true)
+endif
+
 # FIXME: All the drivers should be fixed by adjusting the byte order.
 # See https://gitlab.freedesktop.org/libfprint/libfprint/-/issues/236
 endian_independent_drivers = virtual_drivers + [
@@ -199,6 +214,17 @@ endforeach
 
 if enabled_spi_drivers.length() > 0 and not have_spi
     error('SPI drivers @0@ are not supported'.format(enabled_spi_drivers))
+endif
+
+enabled_sigfm_drivers = []
+foreach driver : sigfm_drivers
+    if driver in drivers
+        enabled_sigfm_drivers += driver
+    endif
+endforeach
+
+if enabled_sigfm_drivers.length() > 0 and not have_opencv
+    error('SIGFM drivers @0@ require opencv4 or opencv5'.format(enabled_sigfm_drivers))
 endif
 
 driver_helper_mapping = {

@@ -156,6 +156,7 @@ endif
 
 # SIGFM-based drivers require OpenCV for SIFT keypoint matching
 sigfm_drivers = [
+    'fpcmoh',
 ]
 
 # Distributions differ in which major version they ship a .pc file for.
@@ -236,6 +237,7 @@ driver_helper_mapping = {
     'aes3500' : [ 'aeslib', 'aes3k' ],
     'aes4000' : [ 'aeslib', 'aes3k' ],
     'uru4000' : [ 'openssl' ],
+    'fpcmoh'  : [ 'openssl' ],
     'elanspi' : [ 'udev' ],
     'virtual_image'          : [ 'virtual' ],
     'virtual_device'         : [ 'virtual' ],
@@ -336,6 +338,14 @@ foreach driver: drivers
 endforeach
 
 if default_drivers_are_enabled and supported_drivers != drivers
+    default_drivers_are_enabled = false
+endif
+
+# data/autosuspend.hwdb is generated from the drivers that are compiled in, and
+# the checked-in copy covers every driver enabled by default, SIGFM ones
+# included. Without OpenCV those drop out of default_drivers, so such a build
+# generates a smaller file and cannot be used to validate the checked-in copy.
+if not have_opencv
     default_drivers_are_enabled = false
 endif
 

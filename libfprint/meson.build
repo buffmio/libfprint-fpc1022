@@ -149,6 +149,8 @@ driver_sources = {
         [ 'drivers/goodixmoc/goodix.c', 'drivers/goodixmoc/goodix_proto.c' ],
     'fpcmoc' :
         [ 'drivers/fpcmoc/fpc.c' ],
+    'fpcmoh' :
+        [ 'drivers/fpcmoh/fpcmoh.c' ],
     'realtek' :
         [ 'drivers/realtek/realtek.c' ],
     'focaltech_moc' :

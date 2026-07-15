@@ -203,6 +203,12 @@ usb:v10A5pC844*
  ID_AUTOSUSPEND=1
  ID_PERSIST=0
 
+# Supported by libfprint driver fpcmoh
+usb:v10A5p9200*
+usb:v10A5p9201*
+ ID_AUTOSUSPEND=1
+ ID_PERSIST=0
+
 # Supported by libfprint driver goodixmoc
 usb:v27C6p5840*
 usb:v27C6p6014*
@@ -419,8 +425,6 @@ usb:v0A5Cp5866*
 usb:v0A5Cp5867*
 usb:v0BDAp5812*
 usb:v10A5p0007*
-usb:v10A5p9200*
-usb:v10A5p9201*
 usb:v10A5p9800*
 usb:v10A5pA120*
 usb:v10A5pA900*

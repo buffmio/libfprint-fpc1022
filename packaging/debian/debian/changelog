@@ -1,0 +1,5 @@
+libfprint-fpc1022 (0.1.0-1) unstable; urgency=medium
+
+  * First experimental package for the FPC1022 10a5:9200 sensor.
+
+ -- buffmio <laesunny@gmail.com>  Sun, 26 Jul 2026 04:30:00 +0800

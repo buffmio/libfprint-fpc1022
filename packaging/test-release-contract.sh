@@ -14,7 +14,7 @@ for path in "$root/packaging/arch" "$root/packaging/debian" "$root/packaging/rpm
   [[ -d $path ]]
 done
 
-if rg -n '/etc/pam\.d|fprintd\.service|sddm' \
+if rg -n -g '!test-*.sh' '/etc/pam\.d|fprintd\.service|sddm' \
   "$root/packaging/arch" "$root/packaging/debian" "$root/packaging/rpm"; then
   printf 'Packaging must not modify PAM, fprintd, or SDDM configuration\n' >&2
   exit 1

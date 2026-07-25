@@ -35,4 +35,10 @@ for script in \
   }
 done
 
+rg -Fq "name 'libfprint-fpc1022-[0-9]*.x86_64.rpm'" \
+  "$root/.github/scripts/build-rpm.sh" || {
+  printf 'RPM builder must select the main package, not debug packages\n' >&2
+  exit 1
+}
+
 printf 'GitHub workflow contract checks passed\n'

@@ -27,7 +27,8 @@ rpmbuild --define "_topdir $top" -ba "$top/SPECS/libfprint-fpc1022.spec"
 
 out="$root/artifacts/$DISTRO_ID"
 mkdir -p "$out"
-package=$(find "$top/RPMS/x86_64" -name 'libfprint-fpc1022-*.rpm' -print -quit)
+package=$(find "$top/RPMS/x86_64" \
+  -name 'libfprint-fpc1022-[0-9]*.x86_64.rpm' -print -quit)
 [[ -n $package ]]
 cp "$package" "$out/"
 stage="$work/stage"

@@ -1,0 +1,49 @@
+pkgname=libfprint-fpcmoh-git
+pkgver=1.94.10.r2.gba10c93
+pkgrel=1
+pkgdesc='libfprint with experimental FPC1022/Disum 10a5:9200 support'
+arch=('x86_64')
+url='https://gitlab.freedesktop.org/libfprint/libfprint/-/merge_requests/570'
+license=('LGPL-2.1-or-later')
+depends=(
+  'glib2'
+  'glibc'
+  'libgcc'
+  'libgudev'
+  'libgusb'
+  'opencv'
+  'openssl'
+  'pixman'
+)
+makedepends=(
+  'git'
+  'glib2-devel'
+  'gobject-introspection'
+  'gtk-doc'
+  'meson'
+  'python-cairo'
+  'python-gobject'
+  'systemd'
+)
+checkdepends=('cairo' 'umockdev')
+provides=('libfprint=1.94.10')
+conflicts=('libfprint')
+_commit='ba10c9398fe4542ff6403549884d0c8687182845'
+source=("git+https://gitlab.freedesktop.org/libfprint/libfprint.git#commit=${_commit}")
+sha256sums=('SKIP')
+
+build() {
+  arch-meson libfprint build \
+    -D drivers=all \
+    -D doc=true \
+    -D installed-tests=false
+  meson compile -C build
+}
+
+check() {
+  meson test -C build --print-errorlogs
+}
+
+package() {
+  DESTDIR="$pkgdir" meson install -C build
+}

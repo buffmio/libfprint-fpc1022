@@ -2,3 +2,14 @@
 *.swp
 _build
 .worktrees/
+artifacts/
+release/
+build-*/
+packaging/arch/pkg/
+packaging/arch/src/
+packaging/arch/*.pkg.tar.*
+packaging/debian/debian/.debhelper/
+packaging/debian/debian/files
+packaging/debian/debian/libfprint-fpc1022/
+packaging/rpm/RPMS/
+packaging/rpm/SRPMS/

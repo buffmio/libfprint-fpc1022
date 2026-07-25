@@ -22,4 +22,13 @@ rg -q 'collect-release\.sh' "$release"
 rg -q 'SHA256SUMS' "$release"
 rg -q 'docs/release-notes-v0\.1\.0-wip\.md' "$release"
 
+for script in \
+  "$root/.github/scripts/build-deb.sh" \
+  "$root/.github/scripts/build-rpm.sh"; do
+  rg -q '^export GIT_DISCOVERY_ACROSS_FILESYSTEM=1$' "$script" || {
+    printf '%s must allow Git discovery across the Actions workspace mount\n' "$script" >&2
+    exit 1
+  }
+done
+
 printf 'GitHub workflow contract checks passed\n'

@@ -8,6 +8,7 @@ esac
 
 root=$(pwd -P)
 [[ -f $root/meson.build ]]
+export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 dnf install -y \
   cpio gcc gcc-c++ git meson ninja-build ripgrep rpm-build \
   cairo-devel glib2-devel gobject-introspection-devel libgudev-devel \

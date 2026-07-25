@@ -8,6 +8,7 @@ esac
 
 root=$(pwd -P)
 [[ -f $root/meson.build ]]
+export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends \

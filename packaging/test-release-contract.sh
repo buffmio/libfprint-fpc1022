@@ -14,6 +14,12 @@ for path in "$root/packaging/arch" "$root/packaging/debian" "$root/packaging/rpm
   [[ -d $path ]]
 done
 
+for script in build-deb.sh build-rpm.sh collect-release.sh; do
+  path="$root/.github/scripts/$script"
+  [[ -x $path ]]
+  head -2 "$path" | grep -q 'set -euo pipefail'
+done
+
 if rg -n -g '!test-*.sh' '/etc/pam\.d|fprintd\.service|sddm' \
   "$root/packaging/arch" "$root/packaging/debian" "$root/packaging/rpm"; then
   printf 'Packaging must not modify PAM, fprintd, or SDDM configuration\n' >&2

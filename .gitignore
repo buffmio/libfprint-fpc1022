@@ -5,6 +5,7 @@ _build
 artifacts/
 release/
 build-*/
+**/__pycache__/
 packaging/arch/pkg/
 packaging/arch/src/
 packaging/arch/*.pkg.tar.*

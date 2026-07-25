@@ -7,7 +7,7 @@
 支持范围：
 
 - 硬件：USB ID `10a5:9200`（FPC Sensor Controller/FPC1022）
-- Arch Linux：`.pkg.tar.zst`
+- Arch Linux：通过现有 AUR 包 `libfprint-fpc1022` 安装，不在 GitHub Release 重复发布二进制包
 - Ubuntu 24.04、Ubuntu 26.04、Debian 13：`.deb`
 - Fedora 42、Fedora 43：`.rpm`
 - 架构：x86_64/amd64
@@ -52,7 +52,7 @@ Release 自动附带 GitHub 生成的源码归档。所有二进制包必须由�
 
 GitHub Actions 使用矩阵任务，在对应发行版环境中安装原生构建依赖、编译、运行测试并制作安装包。
 
-- Arch 使用 Arch 容器和 `makepkg`
+- Arch 的 `PKGBUILD` 保留静态检查、`makepkg` 和 `namcap` 本地验证，但不进入 GitHub Release 构建矩阵
 - Debian/Ubuntu 使用对应发行版容器和 `dpkg-buildpackage`
 - Fedora 使用对应发行版容器和 `rpmbuild`
 
@@ -73,7 +73,6 @@ GitHub Actions 使用矩阵任务，在对应发行版环境中安装原生构�
 
 推送匹配 `v*-wip` 的标签时，Release 工作流复用相同构建逻辑。只有所有矩阵任务成功后才创建公开 GitHub Release，并上传：
 
-- Arch `.pkg.tar.zst`
 - Ubuntu/Debian `.deb`
 - Fedora `.rpm`
 - 每个文件的 SHA-256 校验和
@@ -106,7 +105,7 @@ README 和 Release 说明按发行版给出安装命令，并明确：
 - 安装包只包含预期的 libfprint 库、驱动、规则和元数据
 - 包管理器能识别对官方 libfprint 的替换/冲突关系
 - GitHub Release 中每个文件都有 SHA-256
-- Arch 包继续通过现有 `test-pkgbuild.sh` 和 `namcap`
+- AUR/Arch 包继续通过现有 `test-pkgbuild.sh` 和 `namcap`，README 链接到现有 AUR 页面
 - 实机验证流程记录设备发现、登记和至少两次指纹匹配
 
 ## 非目标
@@ -119,4 +118,3 @@ README 和 Release 说明按发行版给出安装命令，并明确：
 - Windows、macOS 或其他 BSD 系统
 - 自动修改 PAM、SDDM、GDM 或 KDE 配置
 - 声称支持 `10a5:9200` 之外的 FPC 设备
-

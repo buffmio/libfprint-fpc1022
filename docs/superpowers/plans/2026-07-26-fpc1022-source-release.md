@@ -2,7 +2,7 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Publish the complete experimental FPC1022 libfprint source and reproducible Arch, Debian/Ubuntu, and Fedora packages in GitHub Release `v0.1.0-wip`.
+**Goal:** Publish the complete experimental FPC1022 libfprint source and reproducible Debian/Ubuntu and Fedora packages in GitHub Release `v0.1.0-wip`, while directing Arch users to the existing AUR package.
 
 **Architecture:** The existing `mr-570` source branch becomes the GitHub default branch. Distribution-native packaging lives under `packaging/`, shared shell contract tests validate package identity and supported hardware, and GitHub Actions builds each target in its own container before a single release job publishes checksummed artifacts.
 
@@ -13,7 +13,7 @@
 - Project package/repository name is `libfprint-fpc1022`.
 - First release tag is `v0.1.0-wip`; package version is `0.1.0`.
 - Supported hardware is USB ID `10a5:9200`; no other hardware is claimed as tested.
-- Targets are Arch Linux, Ubuntu 24.04, Ubuntu 26.04, Debian 13, Fedora 42, and Fedora 43.
+- Binary Release targets are Ubuntu 24.04, Ubuntu 26.04, Debian 13, Fedora 42, and Fedora 43; Arch Linux uses the existing AUR package.
 - Only x86_64/amd64 packages are released.
 - Packages replace the distribution `libfprint` package but do not bundle `fprintd`.
 - PAM, SDDM, GDM, and KDE configuration is never modified.
@@ -32,7 +32,6 @@
 - `packaging/arch/test-pkgbuild.sh`: Arch package contract.
 - `packaging/debian/debian/*`: Debian/Ubuntu source packaging metadata.
 - `packaging/rpm/libfprint-fpc1022.spec`: Fedora package metadata and build recipe.
-- `.github/scripts/build-arch.sh`: clean Arch container build entry point.
 - `.github/scripts/build-deb.sh`: clean Debian/Ubuntu container build entry point.
 - `.github/scripts/build-rpm.sh`: clean Fedora container build entry point.
 - `.github/scripts/collect-release.sh`: normalizes artifact names and writes SHA-256 sums.
@@ -128,7 +127,7 @@ git commit -m "test: define fpc1022 release contract"
 
 **Interfaces:**
 - Consumes: the repository worktree and `packaging/version.env`.
-- Produces: `libfprint-fpc1022-0.1.0-1-x86_64.pkg.tar.zst`.
+- Produces: the AUR `PKGBUILD` source and local validation evidence; no Arch binary is uploaded to GitHub Release.
 
 - [ ] **Step 1: Write the failing Arch package test**
 
@@ -364,7 +363,6 @@ git commit -m "build: add Fedora RPM package"
 ### Task 5: Add reusable container build entry points
 
 **Files:**
-- Create: `.github/scripts/build-arch.sh`
 - Create: `.github/scripts/build-deb.sh`
 - Create: `.github/scripts/build-rpm.sh`
 - Create: `.github/scripts/collect-release.sh`
@@ -386,7 +384,7 @@ find "$tree" -type f | grep -q 'libfprint-2\\.so\\.2'
 ! find "$tree" -type f | grep -E '/pam\\.d/|fprintd\\.service|/sddm'
 ```
 
-Extend `test-release-contract.sh` to require all four scripts, executable bits, `set -euo pipefail`, and use of `DISTRO_ID`.
+Extend `test-release-contract.sh` to require the three scripts, executable bits, `set -euo pipefail`, and use of `DISTRO_ID`.
 
 - [ ] **Step 2: Run the contract test and verify it fails**
 
@@ -405,11 +403,11 @@ Each script must:
 5. extract it into a temporary directory and call `packaging/test-installed-tree.sh`;
 6. copy only final packages to `artifacts/$DISTRO_ID`.
 
-`build-deb.sh` accepts `ubuntu-24.04`, `ubuntu-26.04`, or `debian-13`; it appends the distro suffix to artifact filenames without changing Debian package metadata. `build-rpm.sh` accepts `fedora-42` or `fedora-43`. `build-arch.sh` accepts only `arch`.
+`build-deb.sh` accepts `ubuntu-24.04`, `ubuntu-26.04`, or `debian-13`; it appends the distro suffix to artifact filenames without changing Debian package metadata. `build-rpm.sh` accepts `fedora-42` or `fedora-43`.
 
 - [ ] **Step 4: Implement artifact collection**
 
-`collect-release.sh artifacts release` must copy packages into `release/`, reject duplicate basenames, require exactly one Arch package, three DEBs, and two RPMs, and create deterministic checksums:
+`collect-release.sh artifacts release` must copy packages into `release/`, reject duplicate basenames, require exactly three DEBs and two RPMs, reject `.pkg.tar.*` files, and create deterministic checksums:
 
 ```bash
 (
@@ -449,7 +447,7 @@ git commit -m "build: add reproducible package entry points"
 
 **Interfaces:**
 - Consumes: build scripts from Task 5.
-- Produces: six named CI artifacts with seven-day retention.
+- Produces: five named CI artifacts with seven-day retention.
 
 - [ ] **Step 1: Write the failing workflow contract test**
 
@@ -461,7 +459,7 @@ rg -q 'ubuntu-26\\.04' .github/workflows/build.yml
 rg -q 'debian-13' .github/workflows/build.yml
 rg -q 'fedora-42' .github/workflows/build.yml
 rg -q 'fedora-43' .github/workflows/build.yml
-rg -q 'arch' .github/workflows/build.yml
+! rg -q 'build-arch|\\.pkg\\.tar' .github/workflows/build.yml
 rg -q 'retention-days: 7' .github/workflows/build.yml
 ! rg -q 'gh release|softprops/action-gh-release' .github/workflows/build.yml
 ```
@@ -474,7 +472,7 @@ Expected: FAIL because `build.yml` is missing.
 
 - [ ] **Step 3: Implement `build.yml`**
 
-Trigger on `push` to the default branch, `pull_request`, and `workflow_dispatch`. Use one matrix job with six entries. Each entry specifies its container image and one of the build scripts. Mount the checked-out workspace normally, run as a non-root builder where required by `makepkg`, and upload `artifacts/${{ matrix.id }}` with `actions/upload-artifact`.
+Trigger on `push` to the default branch, `pull_request`, and `workflow_dispatch`. Use one matrix job with five entries. Each entry specifies its container image and one of the build scripts, then uploads `artifacts/${{ matrix.id }}` with `actions/upload-artifact`. Arch packaging is checked statically outside this binary matrix and links users to AUR.
 
 Pin third-party GitHub Actions to full commit SHAs; add a comment with the corresponding release version.
 
@@ -504,7 +502,7 @@ git commit -m "ci: build packages for supported distributions"
 - Modify: `packaging/test-workflows.sh`
 
 **Interfaces:**
-- Consumes: six package artifact sets from matrix jobs.
+- Consumes: five package artifact sets from matrix jobs.
 - Produces: GitHub Release `v0.1.0-wip` only after all builds succeed.
 
 - [ ] **Step 1: Extend the failing workflow test**
@@ -529,7 +527,7 @@ Expected: FAIL because `release.yml` is missing.
 
 - [ ] **Step 3: Implement the release workflow**
 
-Use the same six-entry build matrix as `build.yml`. A separate `release` job has `needs: build`, downloads all artifacts, runs `collect-release.sh`, verifies the tag equals the `RELEASE_TAG` in `version.env`, and executes:
+Use the same five-entry build matrix as `build.yml`. A separate `release` job has `needs: build`, downloads all artifacts, runs `collect-release.sh`, verifies the tag equals the `RELEASE_TAG` in `version.env`, and executes:
 
 ```bash
 gh release create "$RELEASE_TAG" release/* \
@@ -610,7 +608,7 @@ README sections:
 
 1. experimental status and exact supported USB ID;
 2. source provenance and scope;
-3. Release artifact table by distribution;
+3. Release artifact table for Debian/Ubuntu and Fedora, plus the AUR link for Arch;
 4. installation commands using native package managers;
 5. `lsusb`, `fprintd-enroll`, and two-run `fprintd-verify` validation;
 6. desktop/PAM caveats;
@@ -679,7 +677,7 @@ meson test -C build-release --print-errorlogs udev-hwdb
 
 Expected: compilation passes, all deterministic local tests pass, and udev-hwdb passes.
 
-- [ ] **Step 3: Build all six package targets**
+- [ ] **Step 3: Build all five binary package targets**
 
 Run each `.github/scripts/build-*.sh` in the exact container images declared by `build.yml`, then:
 
@@ -689,11 +687,11 @@ find release -maxdepth 1 -type f -printf '%f\n' | LC_ALL=C sort
 sha256sum -c release/SHA256SUMS
 ```
 
-Expected: one Arch package, three distro-suffixed DEBs, two distro-suffixed RPMs, and a valid `SHA256SUMS`.
+Expected: three distro-suffixed DEBs, two distro-suffixed RPMs, no Arch binary, and a valid `SHA256SUMS`.
 
 - [ ] **Step 4: Perform hardware smoke testing on Arch**
 
-Install the locally built Arch package and run:
+Install or update from the existing AUR package and run:
 
 ```bash
 fprintd-list "$USER"
@@ -705,7 +703,7 @@ Expected: the existing enrollment is listed and both verification attempts retur
 
 - [ ] **Step 5: Record verification evidence**
 
-Append a dated table to `docs/release-notes-v0.1.0-wip.md` listing source test count, six package build results, SHA-256 verification, hardware ID, enrollment discovery, and two verification matches. Do not include fingerprint data or secrets.
+Append a dated table to `docs/release-notes-v0.1.0-wip.md` listing source test count, five binary package build results, AUR package validation, SHA-256 verification, hardware ID, enrollment discovery, and two verification matches. Do not include fingerprint data or secrets.
 
 - [ ] **Step 6: Commit any verification-driven fixes and evidence**
 
@@ -750,7 +748,7 @@ git push github HEAD:refs/heads/source-release-candidate
 
 Expected: push succeeds and `build.yml` starts.
 
-- [ ] **Step 3: Wait for and inspect all six GitHub Actions jobs**
+- [ ] **Step 3: Wait for and inspect all five GitHub Actions jobs**
 
 Run:
 
@@ -796,7 +794,7 @@ gh release view v0.1.0-wip \
   --json url,tagName,isDraft,isPrerelease,assets
 ```
 
-Expected: the release is public, not a draft, references the correct tag, and contains six packages plus `SHA256SUMS` and GitHub source archives.
+Expected: the release is public, not a draft, references the correct tag, and contains five binary packages plus `SHA256SUMS` and GitHub source archives; no Arch binary is attached.
 
 - [ ] **Step 7: Verify downloads and checksums independently**
 

@@ -1,95 +1,84 @@
+# libfprint-fpc1022
 
+Experimental, unofficial libfprint source tree with match-on-host support for
+the FPC Sensor Controller identified as USB `10a5:9200`.
 
-<div align="center">
+> This is work-in-progress hardware support. It is not an official libfprint
+> release and has been tested only on `10a5:9200`.
 
-# LibFPrint
+## Downloads
 
-*LibFPrint is part of the **[FPrint][Website]** project.*
+The first release is `v0.1.0-wip`.
 
-<br/>
+| Distribution | Installation source |
+| --- | --- |
+| Arch Linux | [AUR: libfprint-fpc1022](https://aur.archlinux.org/packages/libfprint-fpc1022) |
+| Ubuntu 24.04 | Release asset ending in `ubuntu-24.04_amd64.deb` |
+| Ubuntu 26.04 | Release asset ending in `ubuntu-26.04_amd64.deb` |
+| Debian 13 | Release asset ending in `debian-13_amd64.deb` |
+| Fedora 42 | Release asset ending in `.fc42.x86_64.rpm` |
+| Fedora 43 | Release asset ending in `.fc43.x86_64.rpm` |
 
-[![Button Website]][Website]
-[![Button Documentation]][Documentation]
+GitHub does not publish an Arch binary because the maintained AUR package is
+already available. Every DEB and RPM asset is built inside its target
+distribution and is x86_64/amd64 only.
 
-[![Button Supported]][Supported]
-[![Button Unsupported]][Unsupported]
+## Install
 
-[![Button Contribute]][Contribute]
-[![Button Contributors]][Contributors]
+Arch Linux:
 
-</div>
+```bash
+yay -S libfprint-fpc1022 fprintd
+```
 
-## History
+Debian or Ubuntu, after downloading the matching asset:
 
-**LibFPrint** was originally developed as part of an
-academic project at the **[University Of Manchester]**.
+```bash
+sudo apt install ./libfprint-fpc1022_*_amd64.deb fprintd
+```
 
-It aimed to hide the differences between consumer
-fingerprint scanners and provide a single uniform
-API to application developers.
+Fedora, after downloading the matching asset:
 
-## Goal
+```bash
+sudo dnf install ./libfprint-fpc1022-*.x86_64.rpm fprintd
+```
 
-The ultimate goal of the **FPrint** project is to make
-fingerprint scanners widely and easily usable under
-common Linux environments.
+The package replaces the distribution libfprint library. It does not bundle
+`fprintd` and does not modify PAM, SDDM, GDM, or KDE configuration.
 
-## License
+## Verify
 
-`Section 6` of the license states that for compiled works that use
-this library, such works must include **LibFPrint** copyright notices
-alongside the copyright notices for the other parts of the work.
+```bash
+lsusb -d 10a5:9200
+fprintd-enroll
+fprintd-verify
+fprintd-verify
+```
 
-**LibFPrint** includes code from **NIST's** **[NBIS]** software distribution.
+Two successful checks should both report `verify-match`. Fingerprint login
+still depends on the display manager and PAM configuration supplied by the
+distribution. SDDM fingerprint login is intentionally not enabled here.
 
-We include **Bozorth3** from the **[US Export Controlled]**
-distribution, which we have determined to be fine
-being shipped in an open source project.
+## Roll back
 
-## Get in *touch*
+See [packaging/ROLLBACK.md](packaging/ROLLBACK.md) for native package-manager
+commands that restore the official libfprint package.
 
- - [IRC] - `#fprint` @ `irc.oftc.net`
- - [Matrix] - `#fprint:matrix.org` bridged to the IRC channel
- - [MailingList] - low traffic, not much used these days
+## Build from source
 
-<br/>
+```bash
+meson setup build -Ddrivers=all -Ddoc=false -Dinstalled-tests=false
+meson compile -C build
+meson test -C build --print-errorlogs --no-suite libfprint:data
+meson test -C build --print-errorlogs udev-hwdb
+```
 
-<div align="right">
+The umockdev tests require an ASCII-only source path on systems where
+umockdev cannot convert non-ASCII filenames.
 
-[![Badge License]][License]
+## Origin and license
 
-</div>
+This branch is based on upstream libfprint MR !570 and retains the complete
+upstream history. See [docs/ATTRIBUTION.md](docs/ATTRIBUTION.md).
 
-
-<!----------------------------------------------------------------------------->
-
-[Documentation]: https://fprint.freedesktop.org/libfprint-dev/
-[Contributors]: https://gitlab.freedesktop.org/libfprint/libfprint/-/graphs/master
-[Unsupported]: https://gitlab.freedesktop.org/libfprint/wiki/-/wikis/Unsupported-Devices
-[Supported]: https://fprint.freedesktop.org/supported-devices.html
-[Website]: https://fprint.freedesktop.org/
-[MailingList]: https://lists.freedesktop.org/mailman/listinfo/fprint
-[IRC]: ircs://irc.oftc.net:6697/#fprint
-[Matrix]: https://matrix.to/#/#fprint:matrix.org
-
-[Contribute]: ./HACKING.md
-[License]: ./COPYING
-
-[University Of Manchester]: https://www.manchester.ac.uk/
-[US Export Controlled]: https://fprint.freedesktop.org/us-export-control.html
-[NBIS]: http://fingerprint.nist.gov/NBIS/index.html
-
-
-<!---------------------------------[ Badges ]---------------------------------->
-
-[Badge License]: https://img.shields.io/badge/License-LGPL2.1-015d93.svg?style=for-the-badge&labelColor=blue
-
-
-<!---------------------------------[ Buttons ]--------------------------------->
-
-[Button Documentation]: https://img.shields.io/badge/Documentation-04ACE6?style=for-the-badge&logoColor=white&logo=BookStack
-[Button Contributors]: https://img.shields.io/badge/Contributors-FF4F8B?style=for-the-badge&logoColor=white&logo=ActiGraph
-[Button Unsupported]: https://img.shields.io/badge/Unsupported_Devices-EF2D5E?style=for-the-badge&logoColor=white&logo=AdBlock
-[Button Contribute]: https://img.shields.io/badge/Contribute-66459B?style=for-the-badge&logoColor=white&logo=Git
-[Button Supported]: https://img.shields.io/badge/Supported_Devices-428813?style=for-the-badge&logoColor=white&logo=AdGuard
-[Button Website]: https://img.shields.io/badge/Homepage-3B80AE?style=for-the-badge&logoColor=white&logo=freedesktopDotOrg
+libfprint is licensed under LGPL-2.1-or-later. See [COPYING](COPYING).

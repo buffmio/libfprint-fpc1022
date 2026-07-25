@@ -65,6 +65,7 @@ driver for the FPC Sensor Controller with USB ID 10a5:9200.
 %{_datadir}/gir-1.0/FPrint-2.0.gir
 %{_datadir}/metainfo/org.freedesktop.libfprint.metainfo.xml
 %{_udevrulesdir}/70-libfprint-2.rules
+%{_prefix}/lib/udev/hwdb.d/60-autosuspend-libfprint-2.hwdb
 
 %changelog
 * Sun Jul 26 2026 buffmio <laesunny@gmail.com> - 0.1.0-1

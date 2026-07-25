@@ -12,6 +12,7 @@ rg -q 'pkgconfig\(opencv4\)' "$spec"
 rg -q 'pkgconfig\(openssl\)' "$spec"
 rg -q '%meson_test' "$spec"
 rg -q '^ExclusiveArch:\s+x86_64$' "$spec"
+rg -Fq '%{_prefix}/lib/udev/hwdb.d/60-autosuspend-libfprint-2.hwdb' "$spec"
 
 if rg -n '/etc/pam\.d|fprintd\.service|sddm' "$spec"; then
   printf 'RPM must not modify authentication configuration\n' >&2

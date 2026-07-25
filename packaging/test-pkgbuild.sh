@@ -9,6 +9,7 @@ fail() {
 }
 
 [[ -f PKGBUILD ]] || fail 'PKGBUILD is missing'
+[[ -f makepkg-ascii.conf ]] || fail 'ASCII-safe makepkg configuration is missing'
 
 # shellcheck disable=SC1091
 source ./PKGBUILD
@@ -17,6 +18,8 @@ source ./PKGBUILD
   fail 'source commit is not pinned to reviewed MR !570 revision'
 [[ ${provides[*]:-} == *'libfprint=1.94.10'* ]] ||
   fail 'package does not provide the compatible libfprint version'
+[[ " ${provides[*]:-} " == *' libfprint-2.so '* ]] ||
+  fail 'package does not provide the libfprint SONAME required by fprintd'
 [[ ${conflicts[*]:-} == *'libfprint'* ]] ||
   fail 'package cannot replace the official libfprint package'
 
@@ -28,5 +31,12 @@ done
 declare -F build >/dev/null || fail 'build() is missing'
 declare -F check >/dev/null || fail 'check() is missing'
 declare -F package >/dev/null || fail 'package() is missing'
+
+(
+  # shellcheck disable=SC1091
+  source ./makepkg-ascii.conf
+  [[ ${BUILDDIR:-} == /tmp/libfprint-fpcmoh-build-* ]] ||
+    fail 'makepkg build directory is not an ASCII-safe /tmp path'
+)
 
 printf 'PKGBUILD contract checks passed\n'

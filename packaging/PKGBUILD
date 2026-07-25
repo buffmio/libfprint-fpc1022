@@ -26,7 +26,7 @@ makedepends=(
   'systemd'
 )
 checkdepends=('cairo' 'umockdev')
-provides=('libfprint=1.94.10')
+provides=('libfprint=1.94.10' 'libfprint-2.so')
 conflicts=('libfprint')
 _commit='ba10c9398fe4542ff6403549884d0c8687182845'
 source=("git+https://gitlab.freedesktop.org/libfprint/libfprint.git#commit=${_commit}")
@@ -41,7 +41,11 @@ build() {
 }
 
 check() {
-  meson test -C build --print-errorlogs
+  # The metainfo validator performs an external URL check. Run the complete
+  # local suite, then run the deterministic hwdb check from the excluded data
+  # suite separately.
+  meson test -C build --print-errorlogs --no-suite libfprint:data
+  meson test -C build --print-errorlogs udev-hwdb
 }
 
 package() {

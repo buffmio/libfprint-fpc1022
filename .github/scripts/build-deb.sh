@@ -15,6 +15,7 @@ apt-get install -y --no-install-recommends \
   libpixman-1-dev libssl-dev libudev-dev meson ninja-build pkgconf \
   python3 python3-cairo python3-gi umockdev
 
+git config --global --add safe.directory "$root"
 "$root/packaging/debian/test-debian-package.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT

@@ -13,6 +13,7 @@ dnf install -y \
   libgusb-devel opencv-devel openssl-devel pixman-devel systemd-devel \
   python3-cairo python3-gobject umockdev
 
+git config --global --add safe.directory "$root"
 "$root/packaging/rpm/test-rpm-package.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT

@@ -1,0 +1,72 @@
+name: Publish release
+
+on:
+  push:
+    tags:
+      - 'v*-wip'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - id: ubuntu-24.04
+            image: ubuntu:24.04
+            script: build-deb.sh
+          - id: ubuntu-26.04
+            image: ubuntu:26.04
+            script: build-deb.sh
+          - id: debian-13
+            image: debian:13
+            script: build-deb.sh
+          - id: fedora-42
+            image: fedora:42
+            script: build-rpm.sh
+          - id: fedora-43
+            image: fedora:43
+            script: build-rpm.sh
+    container:
+      image: ${{ matrix.image }}
+    env:
+      DISTRO_ID: ${{ matrix.id }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - name: Build native package
+        run: bash ".github/scripts/${{ matrix.script }}"
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ matrix.id }}
+          path: artifacts/${{ matrix.id }}
+          if-no-files-found: error
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: artifacts
+      - name: Validate tag and collect artifacts
+        run: |
+          source packaging/version.env
+          test "$GITHUB_REF_NAME" = "$RELEASE_TAG"
+          .github/scripts/collect-release.sh artifacts release
+          test -f release/SHA256SUMS
+      - name: Create release
+        run: |
+          source packaging/version.env
+          gh release create "$RELEASE_TAG" release/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --title "libfprint-fpc1022 $RELEASE_TAG" \
+            --notes-file docs/release-notes-v0.1.0-wip.md \
+            --verify-tag

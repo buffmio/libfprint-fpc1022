@@ -20,7 +20,9 @@ done < <(find "$input" -type f \( -name '*.deb' -o -name '*.rpm' \) | LC_ALL=C s
 
 (
   cd "$output"
-  find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%f\n' |
-    LC_ALL=C sort |
-    xargs sha256sum > SHA256SUMS
+  mapfile -t files < <(
+    find . -maxdepth 1 -type f ! -name SHA256SUMS -printf '%f\n' |
+      LC_ALL=C sort
+  )
+  sha256sum "${files[@]}" > SHA256SUMS
 )

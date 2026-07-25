@@ -2,6 +2,7 @@
 set -euo pipefail
 
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
+# shellcheck disable=SC1091
 source "$root/packaging/version.env"
 
 [[ $PROJECT_VERSION == 0.1.0 ]]

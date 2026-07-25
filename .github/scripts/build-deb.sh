@@ -6,7 +6,7 @@ case ${DISTRO_ID:-} in
   *) printf 'Unsupported DISTRO_ID: %s\n' "${DISTRO_ID:-unset}" >&2; exit 2 ;;
 esac
 
-root=$(git rev-parse --show-toplevel)
+root=${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends \

@@ -8,7 +8,7 @@ esac
 
 root=${GITHUB_WORKSPACE:-$(git rev-parse --show-toplevel)}
 dnf install -y \
-  cpio gcc gcc-c++ git meson ninja-build rpm-build \
+  cpio gcc gcc-c++ git meson ninja-build ripgrep rpm-build \
   cairo-devel glib2-devel gobject-introspection-devel libgudev-devel \
   libgusb-devel opencv-devel openssl-devel pixman-devel systemd-devel \
   python3-cairo python3-gobject umockdev

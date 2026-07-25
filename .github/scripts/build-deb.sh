@@ -13,7 +13,7 @@ apt-get install -y --no-install-recommends \
   build-essential debhelper dpkg-dev git gobject-introspection ripgrep \
   libcairo2-dev libglib2.0-dev libgudev-1.0-dev libgusb-dev libopencv-dev \
   libpixman-1-dev libssl-dev libudev-dev meson ninja-build pkgconf \
-  python3 python3-cairo python3-gi umockdev
+  python3 python3-cairo python3-gi udev umockdev
 
 git config --global --add safe.directory "$root"
 "$root/packaging/debian/test-debian-package.sh"

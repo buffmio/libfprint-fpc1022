@@ -19,6 +19,7 @@ Build-Depends:
  python3,
  python3-cairo,
  python3-gi,
+ udev,
  umockdev
 Standards-Version: 4.7.0
 Homepage: https://github.com/buffmio/libfprint-fpc1022

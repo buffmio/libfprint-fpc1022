@@ -8,7 +8,6 @@ esac
 
 root=$(pwd -P)
 [[ -f $root/meson.build ]]
-export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 export DEBIAN_FRONTEND=noninteractive
 apt-get update
 apt-get install -y --no-install-recommends \
@@ -17,12 +16,12 @@ apt-get install -y --no-install-recommends \
   libpixman-1-dev libssl-dev libudev-dev meson ninja-build pkgconf \
   python3 python3-cairo python3-gi udev umockdev
 
-git config --global --add safe.directory "$root"
 "$root/packaging/debian/test-debian-package.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 mkdir -p "$work/source"
-git -C "$root" archive HEAD | tar -x -C "$work/source"
+tar -C "$root" --exclude=.git --exclude=artifacts -cf - . |
+  tar -x -C "$work/source"
 cp -a "$work/source/packaging/debian/debian" "$work/source/debian"
 (
   cd "$work/source"

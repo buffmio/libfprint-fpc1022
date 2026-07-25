@@ -8,22 +8,20 @@ esac
 
 root=$(pwd -P)
 [[ -f $root/meson.build ]]
-export GIT_DISCOVERY_ACROSS_FILESYSTEM=1
 dnf install -y \
   cpio gcc gcc-c++ git meson ninja-build ripgrep rpm-build \
   cairo-devel glib2-devel gobject-introspection-devel libgudev-devel \
   libgusb-devel opencv-devel openssl-devel pixman-devel systemd-devel \
   python3-cairo python3-gobject umockdev
 
-git config --global --add safe.directory "$root"
 "$root/packaging/rpm/test-rpm-package.sh"
 work=$(mktemp -d)
 trap 'rm -rf "$work"' EXIT
 top="$work/rpmbuild"
 mkdir -p "$top"/{BUILD,BUILDROOT,RPMS,SOURCES,SPECS,SRPMS}
-git -C "$root" archive --format=tar.gz \
-  --prefix=libfprint-fpc1022-0.1.0/ \
-  -o "$top/SOURCES/libfprint-fpc1022-0.1.0.tar.gz" HEAD
+tar -C "$root" --exclude=.git --exclude=artifacts \
+  --transform='s,^,libfprint-fpc1022-0.1.0/,' \
+  -czf "$top/SOURCES/libfprint-fpc1022-0.1.0.tar.gz" .
 cp "$root/packaging/rpm/libfprint-fpc1022.spec" "$top/SPECS/"
 rpmbuild --define "_topdir $top" -ba "$top/SPECS/libfprint-fpc1022.spec"
 

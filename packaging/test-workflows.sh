@@ -25,8 +25,12 @@ rg -q 'docs/release-notes-v0\.1\.0-wip\.md' "$release"
 for script in \
   "$root/.github/scripts/build-deb.sh" \
   "$root/.github/scripts/build-rpm.sh"; do
-  rg -q '^export GIT_DISCOVERY_ACROSS_FILESYSTEM=1$' "$script" || {
-    printf '%s must allow Git discovery across the Actions workspace mount\n' "$script" >&2
+  if rg -q 'git .*archive' "$script"; then
+    printf '%s must archive the checked-out tree without requiring .git\n' "$script" >&2
+    exit 1
+  fi
+  rg -q 'tar .*--exclude=.git' "$script" || {
+    printf '%s must exclude Git metadata from source archives\n' "$script" >&2
     exit 1
   }
 done

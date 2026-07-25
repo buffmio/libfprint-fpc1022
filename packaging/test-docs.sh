@@ -3,6 +3,7 @@ set -euo pipefail
 
 root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 readme="$root/README.md"
+release_notes="$root/docs/release-notes-v0.1.0-wip.md"
 
 for text in \
   '10a5:9200' 'v0.1.0-wip' 'Arch Linux' 'Ubuntu 24.04' \
@@ -17,5 +18,8 @@ rg -q 'apt .*libfprint' "$root/packaging/ROLLBACK.md"
 rg -q 'dnf .*libfprint' "$root/packaging/ROLLBACK.md"
 rg -q 'gitlab\.freedesktop\.org/libfprint/libfprint' "$root/docs/ATTRIBUTION.md"
 rg -q 'merge_requests/570' "$root/docs/ATTRIBUTION.md"
+rg -Uq 'installation\s+options for Arch Linux, Debian, Ubuntu, and Fedora' "$readme"
+rg -Uq 'packages for Debian, Ubuntu, and Fedora' "$release_notes"
+rg -Fq 'from AUR' "$release_notes"
 
 printf 'Documentation contract checks passed\n'

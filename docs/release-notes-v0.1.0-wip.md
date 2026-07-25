@@ -4,9 +4,9 @@ This is an experimental, unofficial libfprint build based on upstream
 merge request !570. It has been tested only with the FPC Sensor Controller
 whose USB ID is `10a5:9200`.
 
-The attached DEB and RPM packages replace the distribution's libfprint
-library. They do not bundle `fprintd` and do not change PAM, SDDM, GDM, or
-desktop authentication settings.
+The attached packages for Debian, Ubuntu, and Fedora replace the
+distribution's libfprint library. They do not bundle `fprintd` and do not
+change PAM, SDDM, GDM, or desktop authentication settings.
 
 Arch Linux users should install
 [`libfprint-fpc1022`](https://aur.archlinux.org/packages/libfprint-fpc1022)

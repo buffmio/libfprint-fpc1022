@@ -1,7 +1,8 @@
 # libfprint-fpc1022
 
 Experimental, unofficial libfprint source tree with match-on-host support for
-the FPC Sensor Controller identified as USB `10a5:9200`.
+the FPC Sensor Controller identified as USB `10a5:9200`, with installation
+options for Arch Linux, Debian, Ubuntu, and Fedora.
 
 > This is work-in-progress hardware support. It is not an official libfprint
 > release and has been tested only on `10a5:9200`.

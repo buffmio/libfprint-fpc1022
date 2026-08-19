@@ -4,6 +4,9 @@ on:
   push:
     tags:
       - 'v*-wip'
+  schedule:
+    - cron: '17 3 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -53,14 +56,24 @@ jobs:
       - name: Validate tag and collect artifacts
         run: |
           source packaging/version.env
-          test "$GITHUB_REF_NAME" = "$RELEASE_TAG"
+          if [[ "$GITHUB_EVENT_NAME" == push ]]; then
+            test "$GITHUB_REF_NAME" = "$RELEASE_TAG"
+          fi
           .github/scripts/collect-release.sh artifacts release
           test -f release/SHA256SUMS
-      - name: Create release
+      - name: Ensure release exists
         run: |
           source packaging/version.env
-          gh release create "$RELEASE_TAG" release/* \
+          if ! gh release view "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release create "$RELEASE_TAG" \
+              --repo "$GITHUB_REPOSITORY" \
+              --title "libfprint-fpc1022 $RELEASE_TAG" \
+              --notes-file docs/release-notes-v0.1.0-wip.md \
+              --verify-tag
+          fi
+      - name: Upload release assets
+        run: |
+          source packaging/version.env
+          gh release upload "$RELEASE_TAG" release/* \
             --repo "$GITHUB_REPOSITORY" \
-            --title "libfprint-fpc1022 $RELEASE_TAG" \
-            --notes-file docs/release-notes-v0.1.0-wip.md \
-            --verify-tag
+            --clobber

@@ -9,7 +9,13 @@ for image in 'ubuntu:latest' 'debian:stable' 'fedora:latest'; do
   rg -Fq "$image" "$build"
   rg -Fq "$image" "$release"
 done
-rg -Fq "cron: '17 3 * * 1'" "$build"
+rg -Fq "cron: '17 3 * * 1'" "$release"
+rg -Fq 'workflow_dispatch:' "$release"
+
+if rg -Fq "cron: '17 3 * * 1'" "$build"; then
+  printf 'Scheduled builds must publish through the release workflow\n' >&2
+  exit 1
+fi
 
 if rg -q 'ubuntu-[0-9]|debian-[0-9]|fedora-[0-9]' "$build" "$release"; then
   printf 'Build workflows must not pin a distro release version\n' >&2
@@ -27,6 +33,9 @@ rg -q 'needs: build' "$release"
 rg -q 'collect-release\.sh' "$release"
 rg -q 'SHA256SUMS' "$release"
 rg -q 'docs/release-notes-v0\.1\.0-wip\.md' "$release"
+rg -Fq 'gh release view' "$release"
+rg -Fq 'gh release upload' "$release"
+rg -Fq -- '--clobber' "$release"
 
 for script in \
   "$root/.github/scripts/build-deb.sh" \

@@ -6,6 +6,8 @@ on:
   pull_request:
   workflow_dispatch:
 
+  schedule:
+    - cron: '17 3 * * 1'
 permissions:
   contents: read
 
@@ -32,32 +34,26 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - id: ubuntu-24.04
-            image: ubuntu:24.04
+          - family: ubuntu
+            image: ubuntu:latest
             script: build-deb.sh
-          - id: ubuntu-26.04
-            image: ubuntu:26.04
+          - family: debian
+            image: debian:stable
             script: build-deb.sh
-          - id: debian-13
-            image: debian:13
-            script: build-deb.sh
-          - id: fedora-42
-            image: fedora:42
-            script: build-rpm.sh
-          - id: fedora-43
-            image: fedora:43
+          - family: fedora
+            image: fedora:latest
             script: build-rpm.sh
     container:
       image: ${{ matrix.image }}
     env:
-      DISTRO_ID: ${{ matrix.id }}
+      DISTRO_FAMILY: ${{ matrix.family }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
       - name: Build native package
         run: bash ".github/scripts/${{ matrix.script }}"
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ${{ matrix.id }}
-          path: artifacts/${{ matrix.id }}
+          name: ${{ matrix.family }}
+          path: artifacts
           retention-days: 7
           if-no-files-found: error

@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-case ${DISTRO_ID:-} in
-  fedora-42|fedora-43) ;;
-  *) printf 'Unsupported DISTRO_ID: %s\n' "${DISTRO_ID:-unset}" >&2; exit 2 ;;
+source /etc/os-release
+case ${DISTRO_FAMILY:-} in
+  fedora) ;;
+  *) printf 'Unsupported DISTRO_FAMILY: %s\n' "${DISTRO_FAMILY:-unset}" >&2; exit 2 ;;
 esac
 
+if [[ ${ID:-} != "$DISTRO_FAMILY" ]]; then
+  printf 'Container ID does not match DISTRO_FAMILY\n' >&2
+  exit 2
+fi
 root=$(pwd -P)
+DISTRO_ID="${ID}-${VERSION_ID}"
 [[ -f $root/meson.build ]]
 dnf install -y \
   cpio gcc gcc-c++ git meson ninja-build ripgrep rpm-build \

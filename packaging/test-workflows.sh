@@ -5,10 +5,16 @@ root=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)
 build="$root/.github/workflows/build.yml"
 release="$root/.github/workflows/release.yml"
 
-for id in ubuntu-24.04 ubuntu-26.04 debian-13 fedora-42 fedora-43; do
-  rg -q "$id" "$build"
-  rg -q "$id" "$release"
+for image in 'ubuntu:latest' 'debian:stable' 'fedora:latest'; do
+  rg -Fq "$image" "$build"
+  rg -Fq "$image" "$release"
 done
+rg -Fq "cron: '17 3 * * 1'" "$build"
+
+if rg -q 'ubuntu-[0-9]|debian-[0-9]|fedora-[0-9]' "$build" "$release"; then
+  printf 'Build workflows must not pin a distro release version\n' >&2
+  exit 1
+fi
 
 rg -q 'retention-days: 7' "$build"
 if rg -q 'build-arch|\.pkg\.tar' "$build" "$release"; then

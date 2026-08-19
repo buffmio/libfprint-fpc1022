@@ -14,15 +14,13 @@ The first release is `v0.1.0-wip`.
 | Distribution | Installation source |
 | --- | --- |
 | Arch Linux | [AUR: libfprint-fpc1022](https://aur.archlinux.org/packages/libfprint-fpc1022) |
-| Ubuntu 24.04 | Release asset ending in `ubuntu-24.04_amd64.deb` |
-| Ubuntu 26.04 | Release asset ending in `ubuntu-26.04_amd64.deb` |
-| Debian 13 | Release asset ending in `debian-13_amd64.deb` |
-| Fedora 42 | Release asset ending in `.fc42.x86_64.rpm` |
-| Fedora 43 | Release asset ending in `.fc43.x86_64.rpm` |
+| Ubuntu/Debian | Release asset built from the latest stable image |
+| Fedora | Release asset built from the latest stable image |
 
 GitHub does not publish an Arch binary because the maintained AUR package is
-already available. Every DEB and RPM asset is built inside its target
-distribution and is x86_64/amd64 only.
+already available. GitHub Actions uses `ubuntu:latest`, `debian:stable`, and
+`fedora:latest`, so a new stable distribution release is picked up by the next
+scheduled build. Every DEB and RPM asset is x86_64/amd64 only.
 
 ## Install
 

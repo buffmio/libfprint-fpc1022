@@ -1,12 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-case ${DISTRO_ID:-} in
-  ubuntu-24.04|ubuntu-26.04|debian-13) ;;
-  *) printf 'Unsupported DISTRO_ID: %s\n' "${DISTRO_ID:-unset}" >&2; exit 2 ;;
+source /etc/os-release
+case ${DISTRO_FAMILY:-} in
+  ubuntu|debian) ;;
+  *) printf 'Unsupported DISTRO_FAMILY: %s\n' "${DISTRO_FAMILY:-unset}" >&2; exit 2 ;;
 esac
 
+if [[ ${ID:-} != "$DISTRO_FAMILY" ]]; then
+  printf 'Container ID does not match DISTRO_FAMILY\n' >&2
+  exit 2
+fi
 root=$(pwd -P)
+DISTRO_ID="${ID}-${VERSION_ID}"
 [[ -f $root/meson.build ]]
 export DEBIAN_FRONTEND=noninteractive
 apt-get update

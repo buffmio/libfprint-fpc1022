@@ -14,8 +14,8 @@ while IFS= read -r file; do
   cp "$file" "$output/$basename"
 done < <(find "$input" -type f \( -name '*.deb' -o -name '*.rpm' \) | LC_ALL=C sort)
 
-[[ $(find "$output" -maxdepth 1 -name '*.deb' | wc -l) -eq 3 ]]
-[[ $(find "$output" -maxdepth 1 -name '*.rpm' | wc -l) -eq 2 ]]
+[[ $(find "$output" -maxdepth 1 -name '*.deb' | wc -l) -eq 2 ]]
+[[ $(find "$output" -maxdepth 1 -name '*.rpm' | wc -l) -eq 1 ]]
 [[ $(find "$output" -maxdepth 1 -name '*.pkg.tar.*' | wc -l) -eq 0 ]]
 
 (

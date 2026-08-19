@@ -9,7 +9,7 @@ source "$root/packaging/version.env"
 [[ $RELEASE_TAG == v0.1.0-wip ]]
 [[ $UPSTREAM_ABI_VERSION == 1.94.10 ]]
 [[ $SUPPORTED_USB_ID == 10a5:9200 ]]
-rg -q '0x10A5.*0x9200' "$root/libfprint/drivers/fpcmoh/fpcmoh.c"
+grep -Eq '0x10A5.*0x9200' "$root/libfprint/drivers/fpcmoh/fpcmoh.c"
 
 for path in "$root/packaging/arch" "$root/packaging/debian" "$root/packaging/rpm"; do
   [[ -d $path ]]
@@ -21,7 +21,7 @@ for script in build-deb.sh build-rpm.sh collect-release.sh; do
   head -2 "$path" | grep -q 'set -euo pipefail'
 done
 
-if rg -n -g '!test-*.sh' '/etc/pam\.d|fprintd\.service|sddm' \
+if grep -REn --exclude='test-*.sh' '/etc/pam\.d|fprintd\.service|sddm' \
   "$root/packaging/arch" "$root/packaging/debian" "$root/packaging/rpm"; then
   printf 'Packaging must not modify PAM, fprintd, or SDDM configuration\n' >&2
   exit 1

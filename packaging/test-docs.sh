@@ -9,22 +9,22 @@ for text in \
   '10a5:9200' 'v0.1.0-wip' 'Arch Linux' \
   'latest stable image' 'ubuntu:latest' 'debian:stable' 'fedora:latest' \
   'fprintd-enroll' 'fprintd-verify' 'experimental' 'MR !570' 'LGPL-2.1'; do
-  rg -Fiq "$text" "$readme"
+  grep -Fiq "$text" "$readme"
 done
 
-if rg -n 'Ubuntu 24\.04|Ubuntu 26\.04|Debian 13|Fedora 42|Fedora 43|Fedora 44' "$readme"; then
+if grep -En 'Ubuntu 24\.04|Ubuntu 26\.04|Debian 13|Fedora 42|Fedora 43|Fedora 44' "$readme"; then
   printf 'README must not list pinned distro releases\n' >&2
   exit 1
 fi
 
-rg -q 'aur\.archlinux\.org/packages/libfprint-fpc1022' "$readme"
-rg -q 'pacman .*libfprint' "$root/packaging/ROLLBACK.md"
-rg -q 'apt .*libfprint' "$root/packaging/ROLLBACK.md"
-rg -q 'dnf .*libfprint' "$root/packaging/ROLLBACK.md"
-rg -q 'gitlab\.freedesktop\.org/libfprint/libfprint' "$root/docs/ATTRIBUTION.md"
-rg -q 'merge_requests/570' "$root/docs/ATTRIBUTION.md"
-rg -Uq 'installation\s+options for Arch Linux, Debian, Ubuntu, and Fedora' "$readme"
-rg -Uq 'packages for Debian, Ubuntu, and Fedora' "$release_notes"
-rg -Fq 'from AUR' "$release_notes"
+grep -Eq 'aur\.archlinux\.org/packages/libfprint-fpc1022' "$readme"
+grep -Eq 'pacman .*libfprint' "$root/packaging/ROLLBACK.md"
+grep -Eq 'apt .*libfprint' "$root/packaging/ROLLBACK.md"
+grep -Eq 'dnf .*libfprint' "$root/packaging/ROLLBACK.md"
+grep -Eq 'gitlab\.freedesktop\.org/libfprint/libfprint' "$root/docs/ATTRIBUTION.md"
+grep -Eq 'merge_requests/570' "$root/docs/ATTRIBUTION.md"
+grep -Pzoq 'installation\s+options for Arch Linux, Debian, Ubuntu, and Fedora' "$readme"
+grep -Pzoq 'packages for Debian, Ubuntu, and Fedora' "$release_notes"
+grep -Fq 'from AUR' "$release_notes"
 
 printf 'Documentation contract checks passed\n'

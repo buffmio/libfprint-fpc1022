@@ -23,6 +23,9 @@ if rg -q 'ubuntu-[0-9]|debian-[0-9]|fedora-[0-9]' "$build" "$release"; then
 fi
 
 rg -q 'retention-days: 7' "$build"
+rg -q 'command -v rg' "$build"
+rg -q 'timeout 180s sudo apt-get update' "$build"
+rg -q 'timeout 180s sudo apt-get install' "$build"
 if rg -q 'build-arch|\.pkg\.tar' "$build" "$release"; then
   printf 'Arch binaries must not be built by GitHub Actions\n' >&2
   exit 1

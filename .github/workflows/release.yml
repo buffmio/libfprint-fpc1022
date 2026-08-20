@@ -1,11 +1,6 @@
 name: Publish release
 
 on:
-  push:
-    tags:
-      - 'v*-wip'
-  schedule:
-    - cron: '17 3 * * 1'
   workflow_dispatch:
 
 permissions:

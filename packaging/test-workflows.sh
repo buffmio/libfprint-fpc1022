@@ -9,13 +9,13 @@ for image in 'ubuntu:latest' 'debian:stable' 'fedora:latest'; do
   grep -Fq "$image" "$build"
   grep -Fq "$image" "$release"
 done
-grep -Fq "cron: '17 3 * * 1'" "$release"
-grep -Fq 'workflow_dispatch:' "$release"
-
-if grep -Fq "cron: '17 3 * * 1'" "$build"; then
-  printf 'Scheduled builds must publish through the release workflow\n' >&2
-  exit 1
-fi
+for workflow in "$build" "$release"; do
+  grep -Fq 'workflow_dispatch:' "$workflow"
+  if grep -Eq '^[[:space:]]+(push|pull_request|schedule):' "$workflow"; then
+    printf 'Workflows must only run through manual workflow_dispatch\n' >&2
+    exit 1
+  fi
+done
 
 if grep -Eq 'ubuntu-[0-9]|debian-[0-9]|fedora-[0-9]' "$build" "$release"; then
   printf 'Build workflows must not pin a distro release version\n' >&2
@@ -31,7 +31,6 @@ if grep -Eq 'build-arch|\.pkg\.tar' "$build" "$release"; then
   printf 'Arch binaries must not be built by GitHub Actions\n' >&2
   exit 1
 fi
-grep -Eq "'v\\*-wip'" "$release"
 grep -Eq 'contents: write' "$release"
 grep -Eq 'needs: build' "$release"
 grep -Eq 'collect-release\.sh' "$release"

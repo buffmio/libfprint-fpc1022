@@ -5,12 +5,15 @@ Summary:        Experimental libfprint build for FPC1022 10a5:9200
 License:        LGPL-2.1-or-later
 URL:            https://github.com/buffmio/libfprint-fpc1022
 Source0:        %{name}-%{version}.tar.gz
+Source1:        fprintd-libfprint.te
 ExclusiveArch:  x86_64
 
 BuildRequires:  gcc
 BuildRequires:  gcc-c++
+BuildRequires:  make
 BuildRequires:  meson
 BuildRequires:  ninja-build
+BuildRequires:  selinux-policy-devel
 BuildRequires:  pkgconfig(cairo)
 BuildRequires:  pkgconfig(gio-unix-2.0)
 BuildRequires:  pkgconfig(glib-2.0)
@@ -29,6 +32,8 @@ Provides:       libfprint = 1.94.10
 Provides:       libfprint-devel = 1.94.10
 Obsoletes:      libfprint < 1.94.11
 Obsoletes:      libfprint-devel < 1.94.11
+Requires(post):  policycoreutils
+Requires(preun):  policycoreutils
 Conflicts:      libfprint > 1.94.10
 Suggests:       fprintd
 
@@ -38,12 +43,14 @@ driver for the FPC Sensor Controller with USB ID 10a5:9200.
 
 %prep
 %autosetup
+cp %{SOURCE1} fprintd-libfprint.te
 
 %build
 %meson \
   -Ddrivers=all \
   -Ddoc=false \
   -Dinstalled-tests=false
+make -f %{_datadir}/selinux/devel/Makefile fprintd-libfprint.pp
 %meson_build
 
 %check
@@ -52,6 +59,17 @@ driver for the FPC Sensor Controller with USB ID 10a5:9200.
 
 %install
 %meson_install
+install -Dpm 0644 fprintd-libfprint.pp %{buildroot}%{_datadir}/libfprint-2/selinux/fprintd-libfprint.pp
+
+%post
+if [ "$1" -gt 0 ]; then
+  %{_sbindir}/semodule -i %{_datadir}/libfprint-2/selinux/fprintd-libfprint.pp || :
+fi
+
+%preun
+if [ "$1" -eq 0 ]; then
+  %{_sbindir}/semodule -r fprintd-libfprint || :
+fi
 
 %files
 %license COPYING
@@ -66,6 +84,7 @@ driver for the FPC Sensor Controller with USB ID 10a5:9200.
 %{_datadir}/metainfo/org.freedesktop.libfprint.metainfo.xml
 %{_udevrulesdir}/70-libfprint-2.rules
 %{_prefix}/lib/udev/hwdb.d/60-autosuspend-libfprint-2.hwdb
+%{_datadir}/libfprint-2/selinux/fprintd-libfprint.pp
 
 %changelog
 * Sun Jul 26 2026 buffmio <laesunny@gmail.com> - 0.1.0-1

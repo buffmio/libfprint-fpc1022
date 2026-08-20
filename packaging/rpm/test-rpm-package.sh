@@ -7,8 +7,11 @@ policy=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)/fprintd-libfprint.te
 grep -Eq '^Name:\s+libfprint-fpc1022$' "$spec"
 grep -Eq '^Version:\s+0\.1\.0$' "$spec"
 grep -Eq '^Provides:\s+libfprint ' "$spec"
-grep -Eq '^Obsoletes:\s+libfprint ' "$spec"
-grep -Eq '^Conflicts:\s+libfprint ' "$spec"
+grep -Eq '^Obsoletes:\s+libfprint$' "$spec"
+if grep -Eq '^Conflicts:\s+libfprint' "$spec"; then
+  printf 'RPM must not restrict replacement by libfprint version\n' >&2
+  exit 1
+fi
 grep -Eq 'pkgconfig\(opencv4\)' "$spec"
 grep -Eq 'pkgconfig\(openssl\)' "$spec"
 grep -Eq '%meson_test' "$spec"

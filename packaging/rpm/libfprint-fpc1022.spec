@@ -30,11 +30,10 @@ BuildRequires:  umockdev
 
 Provides:       libfprint = 1.94.10
 Provides:       libfprint-devel = 1.94.10
-Obsoletes:      libfprint < 1.94.11
+Obsoletes:      libfprint
 Obsoletes:      libfprint-devel < 1.94.11
 Requires(post):  policycoreutils
 Requires(preun):  policycoreutils
-Conflicts:      libfprint > 1.94.10
 Suggests:       fprintd
 
 %description

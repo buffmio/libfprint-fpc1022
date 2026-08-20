@@ -33,13 +33,13 @@ yay -S libfprint-fpc1022 fprintd
 Debian or Ubuntu, after downloading the matching asset:
 
 ```bash
-sudo apt install ./libfprint-fpc1022_*_amd64.deb fprintd
+sudo apt install ./libfprint-fpc1022_*_amd64.deb fprintd libpam-fprintd
 ```
 
 Fedora, after downloading the matching asset:
 
 ```bash
-sudo dnf install ./libfprint-fpc1022-*.x86_64.rpm fprintd
+sudo dnf install ./libfprint-fpc1022-*.x86_64.rpm fprintd fprintd-pam
 ```
 
 The package replaces the distribution libfprint library. It does not bundle

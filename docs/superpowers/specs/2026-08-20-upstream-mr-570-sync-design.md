@@ -2,7 +2,7 @@
 
 ## 目标
 
-在上游 GitLab `libfprint` 的 MR !570 仍处于开放状态时，定期检查其最新提交；有更新时同步到 GitHub 自动 PR，并让现有跨发行版构建流程编译该 PR。MR 被合并或关闭后，自动停止同步和编译，不删除已有 Release。
+在上游 GitLab `libfprint` 的 MR !570 仍处于开放状态时，定期检查其最新提交和发行版基础镜像变化；有更新时同步到 GitHub 自动 PR，并让现有跨发行版构建流程编译该 PR。MR 被合并或关闭后，自动停止同步和编译，不删除已有 Release。
 
 ## 当前问题
 
@@ -38,7 +38,9 @@
 
 显式派发的构建只上传 Actions artifact，不调用 Release workflow；只有同步 PR 合并到 `master` 后，后续 Release 构建才会发布新源码对应的包。
 
-现有每周 `Publish release` workflow 保持发布职责：只有同步 PR 合并到 `master` 后，下一次 Release 构建才会发布新源码对应的包。
+现有每周 `Publish release` workflow 保持发布职责，但在构建前也查询 MR 状态。MR 仍为 `opened` 时，它每周拉取并使用 `ubuntu:latest`、`debian:stable` 和 `fedora:latest`；因此发行版发布新版本或基础镜像更新后，下一次定时运行会重新编译并生成对应 `DISTRO_ID` 的包。MR 为 `merged` 或 `closed` 时，Release workflow 成功结束但跳过构建和发布。
+
+不单独维护发行版版本号；容器标签和构建脚本中的 `ID`/`VERSION_ID` 负责选择最新系统并命名产物。这样系统版本变化和 MR 源码变化都能在定时周期内被处理。
 
 ### 5. 终止条件
 
@@ -47,7 +49,7 @@
 ## 测试与验证
 
 - 新增同步脚本契约测试，验证 GitLab API 字段、状态分支、固定分支名、MR SHA 记录和失败退出行为。
-- 更新 workflow 契约测试，验证定时触发、`pull_request` 构建、权限最小化和停止条件存在。
+- 更新 workflow 契约测试，验证定时触发、`pull_request` 构建、最新发行版镜像未固定版本、`DISTRO_ID` 产物命名、权限最小化和停止条件存在。
 - 本地运行所有现有 Arch、Debian、RPM、文档、Release workflow 契约测试。
 - 通过 `workflow_dispatch` 使用测试分支验证三种容器构建；不会在测试运行中上传 Release。
 

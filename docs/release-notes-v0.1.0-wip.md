@@ -1,5 +1,3 @@
-# libfprint-fpc1022 v0.1.0-wip
-
 This is an experimental, unofficial libfprint build based on upstream
 merge request !570. It has been tested only with the FPC Sensor Controller
 whose USB ID is `10a5:9200`.
